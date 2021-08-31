@@ -49,6 +49,8 @@ static int8_t recognition_enabled = 0;
 static int8_t is_enrolling = 0;
 static face_id_list id_list = {0};
 
+extern boolean matchFace;
+
 static ra_filter_t * ra_filter_init(ra_filter_t * filter, size_t sample_size){
     memset(filter, 0, sizeof(ra_filter_t));
 
@@ -175,6 +177,8 @@ static int run_face_recognition(dl_matrix3du_t *image_matrix, box_array_t *net_b
             if (matched_id >= 0) {
                 Serial.printf("Match Face ID: %u\n", matched_id);
                 rgb_printf(image_matrix, FACE_COLOR_GREEN, "Hello Subject %u", matched_id);
+
+                matchFace=true;
             } else {
                 Serial.println("No Match Found");
                 rgb_print(image_matrix, FACE_COLOR_RED, "Intruder Alert!");
@@ -418,7 +422,7 @@ static esp_err_t stream_handler(httpd_req_t *req){
         int64_t recognize_time = (fr_recognize - fr_face)/1000;
         int64_t encode_time = (fr_encode - fr_recognize)/1000;
         int64_t process_time = (fr_encode - fr_start)/1000;
-        
+
         int64_t frame_time = fr_end - last_frame;
         last_frame = fr_end;
         frame_time /= 1000;
@@ -615,7 +619,7 @@ void startCameraServer(){
 
 
     ra_filter_init(&ra_filter, 20);
-    
+
     mtmn_config.type = FAST;
     mtmn_config.min_face = 80;
     mtmn_config.pyramid = 0.707;
@@ -629,9 +633,9 @@ void startCameraServer(){
     mtmn_config.o_threshold.score = 0.7;
     mtmn_config.o_threshold.nms = 0.7;
     mtmn_config.o_threshold.candidate_number = 1;
-    
+
     face_id_init(&id_list, FACE_ID_SAVE_NUMBER, ENROLL_CONFIRM_TIMES);
-    
+
     Serial.printf("Starting web server on port: '%d'\n", config.server_port);
     if (httpd_start(&camera_httpd, &config) == ESP_OK) {
         httpd_register_uri_handler(camera_httpd, &index_uri);
