@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiServer.h>
@@ -6,6 +7,8 @@
 #include <BlynkSimpleEsp32.h>
 #include <WebServer.h>
 #include <TridentTD_LineNotify.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #define BLYNK_PRINT Serial
 #define LINE_TOKEN  "S3gSqWIb0U2YbFKXU1gbYYeJrKRRlY4oHtjpMzphf7O"
@@ -35,8 +38,8 @@ const char* password = "0868190813";
 String local_IP;
 
 void startCameraServer();
-boolean matchFace = false;
-boolean openLock = false;
+bool matchFace = false;
+bool openLock = false;
 long prevMillis=0;
 int interval = 6000;
 
